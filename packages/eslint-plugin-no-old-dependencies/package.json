@@ -3,7 +3,18 @@
   "version": "0.0.2",
   "type": "commonjs",
   "description": "Plugin to validate dependencies in journey",
-  "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin"
+  ],
+  "author": {
+    "name": "Backbase"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Backbase/eslint-plugin-no-old-dependencies.git"
+  },
   "dependencies": {
     "requireindex": "^1.1.0"
   },
