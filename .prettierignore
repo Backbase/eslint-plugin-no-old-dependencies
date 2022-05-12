@@ -1,0 +1,15 @@
+# Add files here to ignore them from prettier formatting
+
+dist
+coverage
+playwright-report
+test-results
+
+*.api.md
+*.md
+decorate-angular-cli.js
+.tmp
+tmp
+.vscode
+.idea
+.prettierrc
