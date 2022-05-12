@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "projects": {
+    "eslint-plugin-no-old-dependencies": "packages/eslint-plugin-no-old-dependencies"
+  }
+}

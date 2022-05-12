@@ -1,0 +1,48 @@
+{
+  "sourceRoot": "packages/eslint-plugin-no-old-dependencies/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/eslint-plugin-no-old-dependencies",
+        "main": "packages/eslint-plugin-no-old-dependencies/src/index.ts",
+        "tsConfig": "packages/eslint-plugin-no-old-dependencies/tsconfig.lib.json",
+        "assets": [
+          "packages/eslint-plugin-no-old-dependencies/*.md",
+          "libs/eslint-plugin-no-old-dependencies/src/lib/configs/*.json"
+        ]
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs eslint-plugin-no-old-dependencies {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/eslint-plugin-no-old-dependencies/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/eslint-plugin-no-old-dependencies"],
+      "options": {
+        "jestConfig": "packages/eslint-plugin-no-old-dependencies/jest.config.ts",
+        "passWithNoTests": true,
+        "codeCoverage": true
+      }
+    }
+  },
+  "tags": ["type:plugin", "scope:eslint"]
+}
