@@ -11,7 +11,7 @@
         "tsConfig": "packages/eslint-plugin-no-old-dependencies/tsconfig.lib.json",
         "assets": [
           "packages/eslint-plugin-no-old-dependencies/*.md",
-          "libs/eslint-plugin-no-old-dependencies/src/lib/configs/*.json"
+          "packages/eslint-plugin-no-old-dependencies/src/lib/configs/*.json"
         ]
       }
     },
