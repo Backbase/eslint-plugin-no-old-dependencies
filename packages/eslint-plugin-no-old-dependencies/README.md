@@ -2,6 +2,8 @@
 
 ESlint plugin which checks if correct version of common library is used by other libraries.
 
+Author: Gaurav Soni
+
 The plugin:
 
 - Reads the list of common libraries provided in .eslintrc
