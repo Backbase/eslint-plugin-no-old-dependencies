@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "Apache 2.0",
   "scripts": {
-    "prepare": "npx husky install"
+    "prepare": "npx husky install",
+    "build:eslint-plugin": "nx build eslint-plugin-no-old-dependencies"
   },
   "private": true,
   "dependencies": {
