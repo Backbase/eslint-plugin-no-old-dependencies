@@ -1,8 +1,15 @@
 import { Rule } from 'eslint';
-import * as fs from 'fs';
-import * as path from 'path';
-interface PackageVersion {
-  [key: string]: string;
+import { AssignmentExpression, ObjectExpression, Property } from 'estree';
+import { PackageVersion } from './model';
+import { initializeNewPackageVersions } from './new-package-versions';
+import { getProperties, getPropertyKey, getPropertyValue, hasDependencies, hasPeerDependencies } from './utils';
+
+function hasOldVersion(dependency: Property, newPackageVersions: PackageVersion) {
+  const dependencyName = getPropertyKey(dependency);
+  const dependencyVersion = getPropertyValue(dependency);
+  const newPackageVersion = newPackageVersions[dependencyName];
+
+  return newPackageVersion && !dependencyVersion.includes(newPackageVersion);
 }
 
 const rule: Rule.RuleModule = {
@@ -21,31 +28,37 @@ const rule: Rule.RuleModule = {
     ],
   },
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-  create(context: any) {
-    const packages = context.options[0];
-    const newPackageVersions: PackageVersion = {};
-    for (const libPackage of packages) {
-      const packagePath = path.join(__dirname, path.relative(__dirname, `libs/${libPackage}/package.json`));
-      const packageObject = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-      newPackageVersions[packageObject['name']] = packageObject['version'];
-    }
+  create(context: Rule.RuleContext) {
+    const packages: string[] = context.options[0];
+    const newPackageVersions = initializeNewPackageVersions(packages);
+
     return {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      AssignmentExpression: (node: any) => {
-        const json = node.right;
-        const deps = json.properties.find((property: any) => property.key.value === 'dependencies');
-        if (deps) {
-          const oldPackageVersion = deps.value.properties.find((dep: any) => {
-            const newPackageVersion = newPackageVersions[dep.key.value];
-            return newPackageVersion && !dep.value.value.includes(newPackageVersion);
-          });
-          if (oldPackageVersion) {
-            context.report({
-              node: oldPackageVersion.value,
-              message: `${oldPackageVersion.value.value} is old version of ${oldPackageVersion.key.value}`,
-            });
-          }
+      AssignmentExpression: (node: AssignmentExpression) => {
+        const json = node.right as ObjectExpression;
+        const deps = getProperties(json).filter(hasDependencies);
+        const peerDeps = getProperties(json).filter(hasPeerDependencies);
+
+        const allDependencies = [...deps, ...peerDeps];
+        if (allDependencies.length === 0) {
+          return;
         }
+
+        const dependencies = allDependencies[0].value as ObjectExpression;
+        const oldPackageVersion = getProperties(dependencies).find((dep) => hasOldVersion(dep, newPackageVersions));
+
+        if (!oldPackageVersion) {
+          return;
+        }
+
+        const dependencyName = getPropertyKey(oldPackageVersion);
+        const dependencyVersion = getPropertyValue(oldPackageVersion);
+        const newPackageVersion = newPackageVersions[dependencyName];
+
+        context.report({
+          node: oldPackageVersion.value,
+          message: `${dependencyVersion} is old version of ${dependencyName}. Please use ${newPackageVersion}`,
+        });
       },
     };
   },

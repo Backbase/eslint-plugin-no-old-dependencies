@@ -1,12 +1,15 @@
 import { RuleTester } from 'eslint';
-import * as fs from 'fs';
+import * as newPackageVersionsModule from './new-package-versions';
 import { create, meta } from './no-old-deps';
+
+function generateCode(packageJson: object) {
+  return `module.exports = ${JSON.stringify(packageJson)}`;
+}
 
 describe('no-old-deps', () => {
   const ruleTester = new RuleTester();
-  const dependencyPackageJson = {
-    name: 'dependency',
-    version: '2.0.0',
+  const newPackageVersions = {
+    ['dependency']: '2.0.0',
   };
 
   const packageJsonValid = {
@@ -17,8 +20,19 @@ describe('no-old-deps', () => {
     dependencies: { dependency: '1.0.0' },
   };
 
+  const packageJsonValidPeerDependencies = {
+    peerDependencies: { dependency: '2.0.0' },
+  };
+
+  const packageJsonBothKinds = {
+    dependencies: { dependency: '2.0.0' },
+    peerDependencies: { dependency: '1.0.0' },
+  };
+
+  const packageJsonNoDependencies = {};
+
   beforeEach(() => {
-    jest.spyOn(fs, 'readFileSync').mockReturnValueOnce(JSON.stringify(dependencyPackageJson));
+    jest.spyOn(newPackageVersionsModule, 'initializeNewPackageVersions').mockReturnValueOnce(newPackageVersions);
   });
 
   ruleTester.run(
@@ -36,11 +50,23 @@ describe('no-old-deps', () => {
           })}`,
           options: [['dependency']],
         },
+        {
+          code: `module.exports = ${JSON.stringify(packageJsonNoDependencies)}`,
+          options: [['dependency']],
+        },
+        {
+          code: `module.exports = ${JSON.stringify(packageJsonValidPeerDependencies)}`,
+          options: [['dependency']],
+        },
+        {
+          code: `module.exports = ${JSON.stringify(packageJsonBothKinds)}`,
+          options: [['dependency']],
+        },
       ],
       invalid: [
         {
-          code: `module.exports = ${JSON.stringify(packageJsonInvalid)}`,
-          errors: [{ message: `1.0.0 is old version of dependency` }],
+          code: generateCode(packageJsonInvalid),
+          errors: [{ message: `1.0.0 is old version of dependency. Please use 2.0.0` }],
           options: [['dependency']],
         },
       ],
