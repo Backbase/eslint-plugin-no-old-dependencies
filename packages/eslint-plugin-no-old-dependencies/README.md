@@ -2,7 +2,7 @@
 
 ESlint plugin which checks if correct version of common library is used by other libraries.
 
-Author: Gaurav Soni
+Author: Backbase
 
 The plugin:
 
@@ -29,7 +29,14 @@ npm i -D @bb-cli/eslint-plugin-no-old-dependencies
       "rules": {
         "@bb-cli/no-old-dependencies/no-old-deps": [
           "error",
-          ["<common-library>"]
+          [
+            "<common-library>", 
+            "@scoped/library",
+            "libs/library",
+            "packages/library",
+            "libs/groupedFolder/library", 
+            "packages/groupedFolder/library
+          ]
         ]
       }
     }

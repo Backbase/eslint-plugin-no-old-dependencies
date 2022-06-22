@@ -1,13 +1,9 @@
 {
   "name": "@bb-cli/eslint-plugin-no-old-dependencies",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "commonjs",
   "description": "Plugin to validate dependencies in journey",
-  "keywords": [
-    "eslint",
-    "eslintplugin",
-    "eslint-plugin"
-  ],
+  "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
   "author": {
     "name": "Backbase"
   },
