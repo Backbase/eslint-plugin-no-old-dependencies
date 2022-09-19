@@ -4,7 +4,8 @@
   "license": "Apache 2.0",
   "scripts": {
     "prepare": "npx husky install",
-    "build:eslint-plugin": "nx build eslint-plugin-no-old-dependencies"
+    "build:eslint-plugin": "nx build eslint-plugin-no-old-dependencies",
+    "test": "nx affected:test"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +22,7 @@
     "@types/jest": "27.4.1",
     "@types/node": "^16.11.7",
     "@types/requireindex": "^1.2.0",
+    "@types/semver": "^7.3.12",
     "@typescript-eslint/eslint-plugin": "~5.18.0",
     "@typescript-eslint/parser": "~5.18.0",
     "eslint": "^8.12.0",
@@ -32,6 +34,7 @@
     "nx": "14.1.4",
     "prettier": "^2.5.1",
     "requireindex": "^1.2.0",
+    "semver": "^7.3.7",
     "ts-jest": "27.1.4",
     "ts-node": "9.1.1",
     "typescript": "~4.6.2"
