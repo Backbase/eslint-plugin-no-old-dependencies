@@ -1,15 +1,16 @@
 import { Rule } from 'eslint';
 import { AssignmentExpression, ObjectExpression, Property } from 'estree';
+import { satisfies } from 'semver';
 import { PackageVersion } from './model';
 import { initializeNewPackageVersions } from './new-package-versions';
 import { getProperties, getPropertyKey, getPropertyValue, hasDependencies, hasPeerDependencies } from './utils';
 
 function hasOldVersion(dependency: Property, newPackageVersions: PackageVersion) {
-  const dependencyName = getPropertyKey(dependency);
-  const dependencyVersion = getPropertyValue(dependency);
-  const newPackageVersion = newPackageVersions[dependencyName];
+  const dependencyNameInLibraryPackageJson = getPropertyKey(dependency);
+  const dependencyVersionInLibraryPackageJson = getPropertyValue(dependency);
+  const dependencyCurrentVersion = newPackageVersions[dependencyNameInLibraryPackageJson];
 
-  return newPackageVersion && !dependencyVersion.includes(newPackageVersion);
+  return dependencyCurrentVersion && !satisfies(dependencyCurrentVersion, dependencyVersionInLibraryPackageJson);
 }
 
 const rule: Rule.RuleModule = {

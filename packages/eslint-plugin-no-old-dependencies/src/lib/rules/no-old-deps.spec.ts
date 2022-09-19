@@ -9,27 +9,34 @@ function generateCode(packageJson: object) {
 describe('no-old-deps', () => {
   const ruleTester = new RuleTester();
   const newPackageVersions = {
-    ['dependency']: '2.0.0',
+    dependency: '2.0.0',
+    dependencyWithPatchVersion: '2.0.1',
+    dependencyWithMinorVersion: '2.1.0',
+    dependencyWithMajorVersion: '3.1.0',
   };
 
-  const packageJsonValid = {
-    dependencies: { dependency: '2.0.0' },
+  const validScenarios = {
+    noDependencies: {},
+    otherDependency: { dependencies: { 'some-other-dependency': '1.0.0' } },
+    exactMatch: { dependencies: { dependency: '2.0.0' } },
+    exactMatchAsPeerDependency: { peerDependencies: { dependency: '2.0.0' } },
+    exactMatchBothKinds: {
+      dependencies: { dependency: '2.0.0' },
+      peerDependencies: { dependency: '1.0.0' },
+    },
+    tilde: { dependencyWithPatchVersion: '~2.0.0' },
+    dash: { dependencyWithMinorVersion: '^2.0.0' },
+    range: { dependencyWithMajorVersion: '>=2.0.0' },
   };
 
-  const packageJsonInvalid = {
-    dependencies: { dependency: '1.0.0' },
+  const invalidScenarios = {
+    exactMatch: { dependencies: { dependency: '1.0.0' } },
+    tilde: { dependencies: { dependencyWithMinorVersion: '~2.0.0' } },
+    dash: { dependencies: { dependencyWithMajorVersion: '^2.0.0' } },
+    range: { dependencies: { dependencyWithMajorVersion: '>=4.0.0' } },
   };
 
-  const packageJsonValidPeerDependencies = {
-    peerDependencies: { dependency: '2.0.0' },
-  };
-
-  const packageJsonBothKinds = {
-    dependencies: { dependency: '2.0.0' },
-    peerDependencies: { dependency: '1.0.0' },
-  };
-
-  const packageJsonNoDependencies = {};
+  const options = [['dependency']];
 
   beforeEach(() => {
     jest.spyOn(newPackageVersionsModule, 'initializeNewPackageVersions').mockReturnValueOnce(newPackageVersions);
@@ -39,37 +46,17 @@ describe('no-old-deps', () => {
     'no-old-deps',
     { meta, create },
     {
-      valid: [
-        {
-          code: `module.exports = ${JSON.stringify(packageJsonValid)}`,
-          options: [['dependency']],
-        },
-        {
-          code: `module.exports = ${JSON.stringify({
-            dependencies: { 'some-other-dependency': '1.0.0' },
-          })}`,
-          options: [['dependency']],
-        },
-        {
-          code: `module.exports = ${JSON.stringify(packageJsonNoDependencies)}`,
-          options: [['dependency']],
-        },
-        {
-          code: `module.exports = ${JSON.stringify(packageJsonValidPeerDependencies)}`,
-          options: [['dependency']],
-        },
-        {
-          code: `module.exports = ${JSON.stringify(packageJsonBothKinds)}`,
-          options: [['dependency']],
-        },
-      ],
-      invalid: [
-        {
-          code: generateCode(packageJsonInvalid),
-          errors: [{ message: `1.0.0 is old version of dependency. Please use 2.0.0` }],
-          options: [['dependency']],
-        },
-      ],
+      valid: Object.values(validScenarios).map((packageJson) => ({ code: generateCode(packageJson), options })),
+      invalid: Object.values(invalidScenarios).map((packageJson) => {
+        const code = generateCode(packageJson);
+
+        const dependencyName = Object.keys(packageJson.dependencies)[0];
+        const dependencyValue = (packageJson.dependencies as Record<string, string>)[dependencyName];
+        const currentDependencyValue = (newPackageVersions as Record<string, string>)[dependencyName];
+        const message = `${dependencyValue} is old version of ${dependencyName}. Please use ${currentDependencyValue}`;
+        const errors = [{ message }];
+        return { code, errors, options };
+      }),
     },
   );
 });

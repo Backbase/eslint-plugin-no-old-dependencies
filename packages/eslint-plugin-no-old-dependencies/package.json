@@ -1,6 +1,6 @@
 {
   "name": "@bb-cli/eslint-plugin-no-old-dependencies",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "commonjs",
   "description": "Plugin to validate dependencies in journey",
   "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
@@ -12,7 +12,8 @@
     "url": "https://github.com/Backbase/eslint-plugin-no-old-dependencies.git"
   },
   "dependencies": {
-    "requireindex": "^1.1.0"
+    "requireindex": "^1.1.0",
+    "semver": "^7.3.7"
   },
   "engines": {
     "node": ">= 14"
