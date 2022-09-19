@@ -1,5 +1,3 @@
-# NOTE: This code has not yet been published to NPM
-
 # @bb-cli/eslint-plugin-no-old-dependencies
 
 ESlint plugin which checks if correct version of common library is used by other libraries.
